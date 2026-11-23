@@ -40,7 +40,19 @@ python3 scripts/install.py
 3. **進捗を確認する。** 統括に進捗を聞くか、同じ Herdr セッションのシェルで `herdr agent list` を実行します。出力にあるエージェント名を使って `herdr agent read <名前> --source recent-unwrapped --lines 120` で詳細を確認できます。
 4. **結果を受け取る。** 統括から変更内容、対象コミット、検証結果、残る課題を受け取ります。PR 作成まで依頼したい場合は、その旨も依頼に含めます。
 
-Hook を経由せずに始めるときは、Codex で `$factory-orchestrate`、Claude Code で `/factory-orchestrate` を使います。どちらも Issue 番号またはローカルタスクの内容を添えられます。実装担当の CLI を指定しなければ、統括と同じ CLI が選ばれます。
+実装担当の CLI を指定しなければ、統括と同じ CLI が選ばれます。
+
+## Skill を明示的に呼び出す
+
+登録済みの Skill は、Codex では `$名前`、Claude Code では `/名前` を会話に入力して指定できます。Herdr で新しい実装セッションを起動する場合は、対象プロジェクトを開いた Herdr 内の統括ペインから依頼します。
+
+| やりたいこと | Codex での入力例 | Claude Code での入力例 |
+| --- | --- | --- |
+| Issue を実装する | `$factory-orchestrate Issue #101 を実装してください` | `/factory-orchestrate Issue #101 を実装してください` |
+| 影響範囲を調べる | `$factory-investigate Issue #101 の影響範囲と既存テストを調べてください` | `/factory-investigate Issue #101 の影響範囲と既存テストを調べてください` |
+| 既存 PR の CI を調べる | `$factory-pr PR #45 の CI 失敗の原因を調べてください` | `/factory-pr PR #45 の CI 失敗の原因を調べてください` |
+
+Issue 番号の代わりにローカルタスクの目的と完了条件も渡せます。実装、検証、Herdr 起動、記録の各 Skill は、通常は統括が必要な作業情報を添えて使います。
 
 ## 仕組み
 
@@ -64,19 +76,23 @@ Herdr が worktree を作成 → CLI を起動 → タスクを送信
 
 Hook は依頼の1行目を判定し、統括に手順を追加します。対象や依存関係を判断して Herdr に仕事を渡すのは統括です。Plan モードと Factory が作成した子 worktree では、Hook による自動振り分けを抑止します。
 
-| Skill | 役割 |
-| --- | --- |
-| [`factory-orchestrate`](skills/factory-orchestrate/SKILL.md) | Issue、完了条件、依存関係を整理し、担当と確認手順を決める |
-| [`herdr-factory-dispatch`](skills/herdr-factory-dispatch/SKILL.md) | worktree を用意して Codex または Claude Code を起動し、タスクを渡す |
-| [`factory-implement`](skills/factory-implement/SKILL.md) | 担当 Issue の実装、テスト、文書更新、指摘修正を同じ会話で進める |
-| [`factory-investigate`](skills/factory-investigate/SKILL.md) | コードの入口、再利用できる実装、影響範囲、既存テストを調べる |
-| [`factory-verify`](skills/factory-verify/SKILL.md) | 候補コミットの受入条件、動作証跡、利用手順、該当するセキュリティ項目を確認する |
-| [`factory-pr`](skills/factory-pr/SKILL.md) | 既存の `my-walden-review` を使い、PR の作成と指摘・CI のフォローアップを進める |
-| [`factory-record`](skills/factory-record/SKILL.md) | 結果、証跡の参照、停止理由、改善につながる観測を保存する |
+## 7つの Skill の役割と出典
+
+公開 Skill から取り入れた観点は、ローカルでの担当と引き継ぎに合わせて組み込んでいます。
+
+| Skill | 担当と確認すること | 土台・参考資料 |
+| --- | --- | --- |
+| [`factory-orchestrate`](skills/factory-orchestrate/SKILL.md) | Issue の受入条件と依存関係を整理し、1タスクに1実装担当を割り当てる | この Factory の統括手順 |
+| [`herdr-factory-dispatch`](skills/herdr-factory-dispatch/SKILL.md) | worktree とペインを用意し、Codex または Claude Code を起動する。既存の割り当ても確認する | ローカルの `herdr-parallel` と [Herdr CLI](https://herdr.dev/) |
+| [`factory-investigate`](skills/factory-investigate/SKILL.md) | 処理の入口、影響範囲、再利用できる実装、既存テストを調べ、根拠を統括へ返す | Cognition の [codebase-onboarding](https://github.com/CognitionAI/windsurf-demo/tree/main/.windsurf/skills/codebase-onboarding) |
+| [`factory-implement`](skills/factory-implement/SKILL.md) | コードを変更し、必要な回帰テストと利用手順を更新する。指摘修正も元の担当が受け持つ | Cognition の [generate-tests](https://github.com/CognitionAI/windsurf-demo/tree/main/.windsurf/skills/generate-tests) と [readme-hygiene](https://github.com/CognitionAI/team-marketplace-template/tree/main/plugins/docs-and-release/skills/readme-hygiene) |
+| [`factory-verify`](skills/factory-verify/SKILL.md) | 別セッションで候補コミットを確認する。受入条件、UI・CLI・API の動作証跡、利用手順、変更に関係するセキュリティ項目を見る | Factory AI の [droid-control](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control/skills/droid-control) と Cognition の [dependency-audit](https://github.com/CognitionAI/team-marketplace-template/tree/main/plugins/security-guardrails/skills/dependency-audit) |
+| [`factory-pr`](skills/factory-pr/SKILL.md) | 検証済みのコミットを PR にひも付け、作成・更新、レビュー指摘、CI 失敗に対応する | Factory AI の [create-pr](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/code-review/skills/create-pr) と [follow-up-on-pr](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/code-review/skills/follow-up-on-pr) |
+| [`factory-record`](skills/factory-record/SKILL.md) | 結果、証跡の参照、停止理由、手戻りを蓄積する | この Factory の記録手順。[Walden Yan と Zach Lloyd の講演](docs/references.md#code-summit-と関連講演)を参考にした |
+
+QA は指摘と証跡を統括に渡します。統括は[共通の指摘対応手順](skills/factory-orchestrate/SKILL.md#指摘対応)で修正を元の実装担当へ戻し、新しい候補コミットで必要な確認を行います。PR を扱う依頼では `factory-pr` から、それ以外の実装依頼では統括から、別途登録した `my-walden-review` を呼び出します。
 
 統括が記録 Skill を使うと、対象リポジトリの共通 Git ディレクトリ内の `local-software-factory/runs.jsonl` に追記されます。各 worktree から共通 Git ディレクトリを確認するには `git rev-parse --path-format=absolute --git-common-dir` を実行します。現段階の改善機能は情報の蓄積までです。
-
-Factory が作った PR の対応だけを依頼する場合は、Codex で `$factory-pr`、Claude Code で `/factory-pr` に PR 番号または URL と対応範囲を添えます。コードレビューには別途登録済みの `my-walden-review` を使用します。
 
 ## 起動や再開で困ったとき
 
