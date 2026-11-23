@@ -24,3 +24,10 @@
 - [Codex Hooks](https://developers.openai.com/codex/hooks)
 - [Claude Code Skills](https://code.claude.com/docs/en/skills)
 - [Claude Code Hooks](https://code.claude.com/docs/en/hooks)
+
+## Factory の手順設計で参考にした公開 Skill
+
+- PR の作成とフォローアップ。[Factory の PR Skills](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/code-review)
+- アプリ操作、QA と証跡。[Factory Droid Control](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control)
+- コードベース理解とテスト。[Cognition のサンプル](https://github.com/CognitionAI/windsurf-demo/tree/main/.windsurf/skills)
+- 依存関係チェックと README の更新。[Cognition のチーム向けテンプレート](https://github.com/CognitionAI/team-marketplace-template/tree/main/plugins)

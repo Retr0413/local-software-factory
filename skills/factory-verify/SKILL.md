@@ -1,10 +1,12 @@
 ---
 name: factory-verify
-description: Independently verify a Factory candidate commit against acceptance conditions using checks, real behavior and evidence. Use for QA or review.
+description: Independently verify a Factory candidate commit with acceptance tests, runtime evidence, documentation checks, and targeted defensive security checks.
 ---
 
 # Factory の独立検証
 
-指定された候補コミットを確認する。ベース側で決めた受入条件と対象リポジトリの検証手順に沿って、必要なテスト、起動、画面確認、差分確認を行う。作業用の一時ファイルは自身の検証環境に置き、製品コードへの指摘は統括を通して実装担当に返す。
+1. 検証用 worktree が指定された候補コミットを指していることを確認する。実装前に決めた受入条件、ベース側の必須チェック、対象リポジトリの検証手順を確認する。
+2. 条件ごとに必要なテストと動作確認を行う。UI・CLI・API などの実動作を確認するときは [QA と動作証跡](references/qa-evidence.md) を使う。使い方や設定が変わった場合は、該当するドキュメントの手順も照合する。
+3. 統括からセキュリティ確認を指定された場合や、変更に認証・権限、外部入力、依存関係などの影響がある場合は [セキュリティ確認](references/security.md) を使い、確認結果を統括へ渡す。
 
-候補コミット、条件ごとの確認結果、実行コマンド、問題の再現方法、証跡の場所、未検証事項を報告する。検証前提が成立しない場合は理由を付けて保留を報告する。
+候補コミット、条件ごとの成否、実行コマンドと環境、証跡の場所、未検証事項を報告する。確認できない条件は理由付きで保留にする。製品コードに関する指摘は、統括を通じて元の実装担当へ返す。独立したコードレビューが必要な場合は統括に Walden レビューの実施を依頼する。

@@ -1,10 +1,10 @@
 ---
 name: factory-investigate
-description: Investigate a Factory task and report evidence, options and uncertainties to the coordinator without editing the implementation.
+description: Map unfamiliar code, trace affected behavior, and identify existing tests for a Factory Issue. Return sources and uncertainties to the coordinator.
 ---
 
 # Factory 調査担当
 
-依頼された問いを対象コミットと照合し、関連ファイル、仕様、既存テストや変更履歴から根拠を集める。調査対象のコードは読み取りに限定する。手元で参照できない外部資料や実行が必要な確認は、内容を特定して統括へ伝える。
+対象コミットの README とリポジトリの作業ルール、関連する実装とテストを読む。受入条件に関係する入口から処理をたどり、どのコンポーネントやデータが影響を受けるかを整理する。再利用できる既存実装、起動・テスト手順、既存ドキュメントの場所を特定する。
 
-回答は、結論、根拠の場所、確認できなかった点、実装または QA の判断に影響する事項に絞る。
+対象コミットと根拠のファイル・行を添えて、変更候補、関連テスト、確認できなかった点を統括に返す。調査対象のコードは読み取りに限定し、外部資料や実行が必要な確認は統括に渡す。

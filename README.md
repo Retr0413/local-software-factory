@@ -23,7 +23,7 @@ python3 scripts/install.py
 | Codex | `~/.agents/skills/` | `~/.codex/hooks.json` |
 | Claude Code | `~/.claude/skills/` | `~/.claude/settings.json` |
 
-表は既定のパスです。Skill はこの clone を参照するシンボリックリンクとして登録され、Hook も clone 内のスクリプトを参照します。同じ場所で `git pull` すると中身を更新できます。
+表は既定のパスです。Skill と Hook はこの clone 内のファイルを参照します。同じ場所で `git pull` すると中身を更新できます。Skill が増えたときはインストーラーを再実行して登録します。
 
 インストール後は CLI を新しく起動します。Codex が Hook の承認を求めた場合は、`/hooks` で `user_prompt_submit.py` を確認して許可します。[Codex の Hook 設定](https://learn.chatgpt.com/docs/hooks#review-and-trust-hooks)
 
@@ -53,9 +53,13 @@ UserPromptSubmit Hook または統括 Skill の明示起動
     ↓
 Herdr が worktree を作成 → CLI を起動 → タスクを送信
     ↓
-実装担当が変更・テスト ⇄ 必要に応じて独立検証・指摘対応
+実装担当がコード・テスト・文書を変更
     ↓
-統括が結果を確認 → 検証結果・停止理由・改善につながる観測を記録
+候補コミット ⇄ QA・セキュリティ確認・Walden レビュー
+    ↓
+依頼に応じて PR 作成・フォローアップ
+    ↓
+検証結果・停止理由・改善につながる観測を記録
 ```
 
 Hook は依頼の1行目を判定し、統括に手順を追加します。対象や依存関係を判断して Herdr に仕事を渡すのは統括です。Plan モードと Factory が作成した子 worktree では、Hook による自動振り分けを抑止します。
@@ -64,12 +68,15 @@ Hook は依頼の1行目を判定し、統括に手順を追加します。対�
 | --- | --- |
 | [`factory-orchestrate`](skills/factory-orchestrate/SKILL.md) | Issue、完了条件、依存関係を整理し、担当と確認手順を決める |
 | [`herdr-factory-dispatch`](skills/herdr-factory-dispatch/SKILL.md) | worktree を用意して Codex または Claude Code を起動し、タスクを渡す |
-| [`factory-implement`](skills/factory-implement/SKILL.md) | 担当 Issue の実装、テスト、指摘修正を同じ会話で進める |
-| [`factory-investigate`](skills/factory-investigate/SKILL.md) | 既存コードや仕様を調べ、判断に必要な根拠を返す |
-| [`factory-verify`](skills/factory-verify/SKILL.md) | 候補コミットを受入条件に照らして独立に検証する |
+| [`factory-implement`](skills/factory-implement/SKILL.md) | 担当 Issue の実装、テスト、文書更新、指摘修正を同じ会話で進める |
+| [`factory-investigate`](skills/factory-investigate/SKILL.md) | コードの入口、再利用できる実装、影響範囲、既存テストを調べる |
+| [`factory-verify`](skills/factory-verify/SKILL.md) | 候補コミットの受入条件、動作証跡、利用手順、該当するセキュリティ項目を確認する |
+| [`factory-pr`](skills/factory-pr/SKILL.md) | 既存の `my-walden-review` を使い、PR の作成と指摘・CI のフォローアップを進める |
 | [`factory-record`](skills/factory-record/SKILL.md) | 結果、証跡の参照、停止理由、改善につながる観測を保存する |
 
 統括が記録 Skill を使うと、対象リポジトリの共通 Git ディレクトリ内の `local-software-factory/runs.jsonl` に追記されます。各 worktree から共通 Git ディレクトリを確認するには `git rev-parse --path-format=absolute --git-common-dir` を実行します。現段階の改善機能は情報の蓄積までです。
+
+Factory が作った PR の対応だけを依頼する場合は、Codex で `$factory-pr`、Claude Code で `/factory-pr` に PR 番号または URL と対応範囲を添えます。コードレビューには別途登録済みの `my-walden-review` を使用します。
 
 ## 起動や再開で困ったとき
 
