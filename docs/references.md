@@ -25,9 +25,8 @@
 - [Claude Code Skills](https://code.claude.com/docs/en/skills)
 - [Claude Code Hooks](https://code.claude.com/docs/en/hooks)
 
-## Factory の手順設計で参考にした公開 Skill
+## 7担当の手順と公開 Skill の対応
 
-- PR の作成とフォローアップ。[Factory の PR Skills](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/code-review)
-- アプリ操作、QA と証跡。[Factory Droid Control](https://github.com/Factory-AI/factory-plugins/tree/master/plugins/droid-control)
-- コードベース理解とテスト。[Cognition のサンプル](https://github.com/CognitionAI/windsurf-demo/tree/main/.windsurf/skills)
-- 依存関係チェックと README の更新。[Cognition のチーム向けテンプレート](https://github.com/CognitionAI/team-marketplace-template/tree/main/plugins)
+原本の比較、採否、既存の担当に集約した観点は[公開 Skill 調査](skill-survey.md)に記載した。各 GitHub リンクは調査したコミットを指す。
+
+Skill の構成には [Anthropic の作成ガイド](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)、検証には [OpenAI の Skill 評価](https://developers.openai.com/blog/eval-skills/) と [Agent Skills の評価ガイド](https://agentskills.io/skill-creation/evaluating-skills)も参照した。ローカル固有の復旧状態と記録形式は同梱の [dispatch.py](../skills/herdr-factory-dispatch/scripts/dispatch.py) と [record.py](../skills/factory-record/scripts/record.py) を参照する。

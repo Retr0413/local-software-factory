@@ -1,0 +1,189 @@
+{
+  "model": "gpt-6.2-astra",
+  "reasoning": "low",
+  "codex_cli": "0.171.0",
+  "rounds": [
+    {
+      "case": 1,
+      "A": {
+        "seconds": 9.7,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-orchestrate/SKILL.md": "ea80d6ef8b0022954d64b11473e35385c6900a2426544b79cda62b2da1cf9a15",
+          "herdr-factory-dispatch/SKILL.md": "3eb50d578751f0adbf9a1acf9343d26eba64551605a6aad414fa67a42ff9f249",
+          "herdr-factory-dispatch/scripts/dispatch.py": "b6f6edc4effec88c1f0df33afaaeb1ea9d8f3e186dc68274b4a7f589a4200344"
+        },
+        "response": "- **#61** は `existing_issue` で、元の担当への送信は未確認です。east の `w1:p2` のシェル表示から west での受領は判断できません。今は再送・再起動を保留します。west に再接続できたら、記録された workspace・ペイン `w1:p2`・worktree・ブランチ・HEAD を照合し、元の会話末尾を確認します。受領済みなら候補 SHA と報告を待ち、未受領と確認できた場合だけ元の担当に再送します。\n- **#62** は #61 の新形式を含むコミットの確認待ちです。確認後、その完全な SHA を `base` に指定して起動します。\n- **#63** は `capacity_limit` で未割り当てです。独立タスクなので、対象の統括ペインを利用できて枠が空いた時点で、#63 だけを再投入します。"
+      },
+      "B": {
+        "seconds": 11.3,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-orchestrate/SKILL.md": "23d2ed5c3212daa76ab1f0ffe888a8eea5df53d801b4770da55d6d922f8224d2",
+          "herdr-factory-dispatch/SKILL.md": "83d58a768c4f0877e6c56fbd87605cc38594548dd5c72f00df7c24eabbbfebc8",
+          "herdr-factory-dispatch/scripts/dispatch.py": "b6f6edc4effec88c1f0df33afaaeb1ea9d8f3e186dc68274b4a7f589a4200344"
+        },
+        "response": "今は3件を個別に保留します。east の `w1:p2` は別セッションのため、シェル表示から #61 の未受領とは判断できません。バッチの再送はしません。\n\n| Issue | 再開条件と次の操作 |\n|---|---|\n| #61 | `west` に再接続できたら、元の `w1:p2` の会話末尾を確認します。受領済みなら元担当の結果を待ち、未受領を確認できた場合だけ同じ担当へ再送します。 |\n| #62 | #61 の新形式を確認できたら、その変更を含むコミットの完全な SHA を `base` に指定して起動します。 |\n| #63 | 独立タスクなので、枠が空き次第、#61・#62 を待たずに #63 だけを再投入します。 |"
+      }
+    },
+    {
+      "case": 2,
+      "A": {
+        "seconds": 38.0,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "skill_files_sha256": {
+          "factory-investigate/SKILL.md": "576479ed64547eafedc6b5acbae0ab4cc9af99af9080e2c74aeede3f87dfa8ba",
+          "factory-implement/SKILL.md": "5c1bfd0801ba30816b39ee5260f885a064a1c0928c8d599234566dda355b45fc"
+        },
+        "response": "Issue #72 を修正しました。`show` は保存済みの `false` を `off` と表示し、設定ファイルがない初回は従来どおり `on` と表示します。原因は `or True` が保存済みの `false` まで既定値で上書きしていたことです。既定値を使う条件を `enabled` キーがない場合に限定しました。[prefs.py](/private/tmp/factory-five.f1qdhF/r2-A/work/prefs.py:10)\n\n回帰テストでは、一時ファイルを使い、各 CLI 操作を別プロセスで実行しました。修正前は初回の `show` が `on`、`set off` が `saved`、保存された JSON が `{\"enabled\": false}` であることまで確認でき、その直後の `show` だけが `on` を返して失敗しました。修正後は同じ操作で `off` が返り、`python3 -m unittest -v` は作業ディレクトリと候補コミットの両方で成功しました。[回帰テスト](/private/tmp/factory-five.f1qdhF/r2-A/work/test_prefs.py:11)\n\n候補コミットは `b7b3e7f39dc0bbeed90251be5248edfe5e9df5c2`、ベースは `a80be6de89653899b3fa7a0ddb34fdca8dde309b` です。作業ディレクトリの `.git` が読み取り専用のため、修正とテストは指定場所に置き、候補コミットはローカル複製で作成しました。[検証済みの Git bundle](/private/tmp/issue72.tELPQ2/issue-72.bundle)"
+      },
+      "B": {
+        "seconds": 35.9,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          false
+        ],
+        "skill_files_sha256": {
+          "factory-investigate/SKILL.md": "8498b17b9f26011648cd423e9079e54eb8fb5f4a3e1566f23fc9cd72344a1103",
+          "factory-implement/SKILL.md": "83fd8778fc80d243f03cca8f9c985b84f3155e0545cbd69e19ba5722d3bd3166"
+        },
+        "response": "Issue #72 を修正しました。`show` は保存済みの `false` を `off` と表示し、設定ファイルがない初回は従来どおり `on` と表示します。原因は、読み戻し時に `or True` が `False` まで上書きしていたことです。既定値はキーがない場合だけ適用するようにしました。[prefs.py](/private/tmp/factory-five.f1qdhF/r2-B/work/prefs.py:10)\n\n修正前の `a80be6d` で、`set off` が `saved` を返し、ファイルに JSON の `false` が保存されても、別プロセスの `show` が `on` を返すことを再現しました。初回表示のテストは修正前から成功し、修正後は `python3 -m unittest -v` で両方のテストが成功しました。[再現テスト](/private/tmp/factory-five.f1qdhF/r2-B/work/test_prefs.py:18)\n\n候補コミットは `99e3495a92bd5cd07a9790fbd987eee43b37fbed` です。指定ディレクトリの `.git` が読み取り専用のため、修正とテストは指定場所に残し、同じベースの[ローカル複製](/private/tmp/prefs-72.lyVnqp)にコミットしました。候補コミット上でも両テストが成功しました。"
+      }
+    },
+    {
+      "case": 3,
+      "A": {
+        "seconds": 34.1,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-verify/SKILL.md": "5b95e77902c2c37d19a585b7a0d888d8f92bae024884c88b4e05dfd4017f484d",
+          "factory-verify/references/hook-example.md": "1f795eed867ebc904a69d23a0e10207a57ed1ff289870751f2a3fa56fdd096d9",
+          "factory-verify/references/qa-evidence.md": "502072e7108a3e3318188e4f27e0aab731444304b2f358a193b7a829d85a1cb1",
+          "factory-verify/references/security.md": "83cc9d8016bbfd31d4818836d354958736c767ca14c0d207c3511af8519e5ccb"
+        },
+        "response": "**受入条件3件のうち、合格1件、不合格1件、未確認1件です。** `off` は設定ファイルに保存されましたが、次のプロセスで `show` を実行すると `on` と表示されました。\n\n| 受入条件 | 判定 | CLI での直接観測 |\n|---|---|---|\n| 初期状態は `on` | 合格 | 設定ファイルが存在しない状態で `python3 prefs.py show` を実行し、`on` を確認。終了コードは `0`。 |\n| `off` を保存すると次のプロセスも `off` | 不合格 | `python3 prefs.py set off` は `saved` を返し、ファイルの内容は `{\"enabled\": false}`。同じ `PREFS_FILE` を使って別プロセスで `python3 prefs.py show` を実行すると、期待値 `off` に対して実測は `on`。どちらも終了コードは `0`。 |\n| 明示的な `sync` が実サービスに届く | 未確認 | `python3 prefs.py sync` の出力は `accepted by local mock`、終了コードは `0`。README の記載どおり、候補の `sync` はこの文字列を表示するだけです。実サービスと資格情報がなく、受信は観測できませんでした。再検証には実送信する実装、接続先、資格情報、サービス側の受信記録が必要です。 |\n\n読み戻しに失敗する原因は、`show` の `data.get('enabled') or True` が、保存済みの `False` も `True` と評価することです。[該当コード](/private/tmp/factory-five.f1qdhF/r3-A/work/prefs.py:10)\n\n**自動テストと検証環境**　`base` と `candidate` のどちらにも自動テストや必須チェックの定義はなく、タグ間の差分は README の追加だけでした。上表はすべて CLI の直接観測です。`git rev-parse HEAD` で候補タグと同じ `a80be6de89653899b3fa7a0ddb34fdca8dde309b` を確認し、指定の作業ディレクトリで Darwin arm64 / Python 3.9.6 を使用しました。[実行ログ](/private/tmp/prefs-qa.EbXiOV/cli.log)・[保存された設定](/private/tmp/prefs-qa.EbXiOV/prefs.json)"
+      },
+      "B": {
+        "seconds": 33.4,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-verify/SKILL.md": "f1dd7006589ff14246ac136beff64fb9f7a3bcb50d6557f5721e58fe1a7726b9",
+          "factory-verify/references/hook-example.md": "1f795eed867ebc904a69d23a0e10207a57ed1ff289870751f2a3fa56fdd096d9",
+          "factory-verify/references/qa-evidence.md": "502072e7108a3e3318188e4f27e0aab731444304b2f358a193b7a829d85a1cb1",
+          "factory-verify/references/security.md": "83cc9d8016bbfd31d4818836d354958736c767ca14c0d207c3511af8519e5ccb"
+        },
+        "response": "**受入判定は不合格です。** 初期値は `on` でしたが、`off` を保存した後も次のプロセスは `on` を表示しました。実サービスへの `sync` 到達は未確認です。\n\n| 受入条件 | 判定 | CLIでの直接観測 |\n|---|---|---|\n| 初期状態は `on` | 合格 | 設定ファイルが存在しない状態で `python3 prefs.py show` を実行し、`on` を確認。終了コード `0`。 |\n| `off` を保存すると次のプロセスも `off` | 不合格 | `python3 prefs.py set off` は `saved` を返し、ファイルには `{\"enabled\": false}` が保存された。同じ `PREFS_FILE` を指定した別プロセスで `python3 prefs.py show` を実行すると、期待値 `off` に対して実測は `on`。どちらも終了コード `0`。 |\n| 明示的な `sync` が実サービスに届く | 未確認 | `python3 prefs.py sync` の出力は `accepted by local mock`、終了コードは `0`。候補の `sync` はこの文字列を表示するだけで、送信処理がない。到達確認には実サービスへ送信する実装、接続先、資格情報、受信側の記録が必要。 |\n\n読み戻し時の `data.get('enabled') or True` が、保存済みの `False` も `True` に変換しています。[該当コード](/private/tmp/factory-five.f1qdhF/r3-B/work/prefs.py:10)\n\n**既存テスト**は両タグに収録されておらず、リポジトリ内に必須チェックの指定もありません。`base`（`fdaef089cde78c59acdbca44b2521da0f4725cde`）から `candidate` への差分は README の追加のみです。\n\n**実行環境と証跡**　指定の作業ディレクトリで `git rev-parse HEAD` が `candidate`（`a80be6de89653899b3fa7a0ddb34fdca8dde309b`）と一致することを確認し、Python 3.9.6 で各コマンドを実行しました。[実行ログ](/private/tmp/prefs-qa.K2ERxK/results.txt)・[保存された設定](/private/tmp/prefs-qa.K2ERxK/prefs.json)"
+      }
+    },
+    {
+      "case": 4,
+      "A": {
+        "seconds": 26.5,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-pr/SKILL.md": "e810683f89197781fd21a5cf5757ec34da04ae26b09130901f6cdffd7d853adb",
+          "factory-pr/scripts/list_review_threads.py": "08dc3d926f9842f26f9290cc60a70028eddb45acf26dd6e452ca0a4dd0ed64d6"
+        },
+        "response": "**PR #47 の公開判断は保留です。** 現在の head `e22` に対応する QA 結果は未取得です。取得済み QA は `e21`、一覧の `tests=green` は `e20` の結果です。`e22` の外部 CI は `pending` で、詳細を閲覧する権限もありません。\n\n**確認できた未解決スレッドは少なくとも2件、確認分の対応項目は1件です。** ページ1の `t8` と `t9` は、どちらも空入力の拒否を求めています。ページ2は取得中にタイムアウトしたため、未解決スレッドの総数と追加の対応項目数は未確定です。\n\n**元の実装担当への依頼案（未送信）**  \nPR #47 の `t8`・`t9` をまとめて扱い、`e22` の該当箇所で空入力が拒否されるか確認してください。対処済みなら実装箇所とテスト結果を返してください。空入力を受理する場合は元の worktree で修正し、空入力の拒否と有効な入力の受理を確認したテスト結果を、修正後の候補 SHA とともに返してください。\n\n**次の照合**\n\n1. ページ2以降を最終ページまで再取得し、追加の指摘を含めて件数と対応項目を確定する。\n2. 関連 Issue と Factory の作業記録で元担当・worktree を特定し、PR 作成者と現在の head を照合する。\n3. 最終候補 SHA で QA と必須チェックを実行し、同じ候補に対する外部 CI の状態を再確認する。詳細権限が引き続きなければ、確認できた状態と詳細 URL を記録する。\n4. 公開判断を再開する際は、その時点の PR head、元担当に渡した head、検証済み候補 SHA を照合する。途中で更新があれば差分と影響する確認を見直す。\n\n今回は取得済み情報によるローカル仕分けに限り、`e22` の差分を対象とする Walden コードレビューは未実施です。Herdr・GitHub への操作や公開は行っていません。"
+      },
+      "B": {
+        "seconds": 23.8,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-pr/SKILL.md": "54406d070e8670a322e419b03309bbb7f71104a05dd532155c3619c1f348648d",
+          "factory-pr/scripts/list_review_threads.py": "08dc3d926f9842f26f9290cc60a70028eddb45acf26dd6e452ca0a4dd0ed64d6"
+        },
+        "response": "**PR #47 の公開判断は保留です。** 現在の head `e22` について、QA は未確認です。取得済みの QA は `e21` が対象です。CI 一覧の `tests=green` は `e20` の結果で、`e22` の外部 CI は `pending` です。詳細を閲覧する権限はありません。\n\n- **件数**　観測済みの未解決スレッドは **少なくとも2件**です。ページ1の `t8` と `t9` はどちらも空入力の拒否を求めており、対応依頼は1件にまとめられます。ページ2がタイムアウトしたため、未解決スレッドの総数と、重複をまとめた後の対応件数は未確定です。\n- **元の Herdr 実装担当への依頼案（未送信）**　「`t8`・`t9` の両方を参照し、`e22` の対象箇所で空入力が拒否されるか確認してください。すでに拒否される場合は該当箇所とテスト結果を、受理される場合は修正後の候補 SHA と空入力の拒否を確認したテスト結果を返してください。」\n- **次の照合**　PR の head を再確認し、ページ2から最終ページまで取得して両スレッドを含む未解決一覧を照合します。head が変わっていれば、指摘の該当箇所も見直します。公開判断には、その時点の候補 SHA に対応する QA 結果と外部 CI の最終状態を別々に記録します。\n\n今回は取得済み情報の仕分けのみを行いました。`e22` の差分に対する Walden コードレビューは対象外として省略し、公開・投稿・スレッド解決は行っていません。"
+      }
+    },
+    {
+      "case": 5,
+      "A": {
+        "seconds": 24.5,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-record/SKILL.md": "86b03de3761bea59c8db22b805441630726e3a5b560f4ce0ce771d72543c97ad",
+          "factory-record/scripts/record.py": "ce7f1ede65fdaa56a0f885bc31549e94275a743aef6d415e7beab42c0825f081"
+        },
+        "response": "Issue #85 の `sync-17` を[共有作業記録](</private/tmp/factory-five.f1qdhF/r5-A/record-metadata/local-software-factory/runs.jsonl:1>)に保存しました。初回は1件追記し、2回目は同じ配達IDの既存行と元データが一致したため追記を省略しました。保存先を読み直し、`sync-17` が **1件**で、`outcome` が「外部同期は未確認」、`checks` が `[\"保存成功\"]` であることを確認しました。\n\n`sync-18` を受け取った場合も、全受信処理で共通の `delivery.lock` を取得し、`runs.jsonl` 内の配達IDを照合します。未登録ならロックを保持したまま `record.py` で1件追記します。これにより、報告内容が同じでも `sync-18` は別の観測として保存でき、成功応答が消失して再送されても重複を防げます。"
+      },
+      "B": {
+        "seconds": 25.2,
+        "criteria_met": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "skill_files_sha256": {
+          "factory-record/SKILL.md": "1b846e311026e90908a90c453b0958a521fd7411f45c1a07bbffd139fed817c0",
+          "factory-record/scripts/record.py": "86f4e174c2239a24fc60f943e9282925fbb74cbe987c74a7764312546dbb4895"
+        },
+        "response": "Issue #85 の `sync-17` を保存し、**再送後も記録が1件だけ**であることを確認しました。開始時点では該当記録が0件だったため、初回分を保存しました。保存内容が `outcome=\"外部同期は未確認\"`、`checks=[\"保存成功\"]` と一致することを照合してから同じ JSON を再送し、件数と記録時刻が初回のままであることを確認しました。保存先は [runs.jsonl](/private/tmp/factory-five.f1qdhF/r5-B/record-metadata/local-software-factory/runs.jsonl) です。\n\n別の観測 `sync-18` が届いたら、元の JSON の `event_id` だけを `sync-18` に変え、同じ worktree で `record.py` に渡します。`task` と `event_id` の組で識別するため、報告内容が同じでも `sync-17` と `sync-18` が各1件保存されます。`sync-18` の再送時も同じ ID と内容を使います。"
+      }
+    }
+  ],
+  "direct_replay": {
+    "A": {
+      "same_id_deliveries": 2,
+      "rows_after_same_id": 2,
+      "rows_after_distinct_id": 3,
+      "ids": [
+        "sync-17",
+        "sync-17",
+        "sync-18"
+      ]
+    },
+    "B": {
+      "same_id_deliveries": 2,
+      "rows_after_same_id": 1,
+      "rows_after_distinct_id": 2,
+      "ids": [
+        "sync-17",
+        "sync-18"
+      ]
+    }
+  }
+}
