@@ -78,6 +78,10 @@ Hook は依頼の1行目を判定し、統括に手順を追加します。対�
 
 ## 7つの Skill の役割と出典
 
+インストーラーは7つの担当を Codex と Claude Code に登録します。各担当の `SKILL.md` に「Description（使う場面）→ 読む Skill」の一覧があり、担当セッションが該当する内部 Skill を直接読みます。19の内部 Skill はそれぞれ `procedures/<名前>/SKILL.md` に `name`、`description`、判断手順、出典と採用理由を持ちます。Hook の入出力例は QA の参考資料です。段階的な読み込みは [Agent Skills の公式仕様](https://agentskills.io/specification#progressive-disclosure)、担当内の条件表は [Factory AI の droid-control](https://github.com/Factory-AI/factory-plugins/blob/e63e519a736140c86f37be95a529a0c44dc9a96e/plugins/droid-control/skills/droid-control/SKILL.md) を参考にしました。内部 Skill の選択は各担当の指示で行います。
+
+たとえば「既存 PR の CI が失敗した」なら、[PR 担当](skills/factory-pr/SKILL.md)から [CI の切り分け](skills/factory-pr/procedures/factory-pr-ci/SKILL.md)を読みます。「未解決コメントも整理して」と依頼された時点で[スレッドの仕分け](skills/factory-pr/procedures/factory-pr-review-threads/SKILL.md)も開きます。この読み分けは同じ担当セッションで行います。
+
 公開 Skill から取り入れた観点は、ローカルでの担当と引き継ぎに合わせて組み込んでいます。各社の原本、採用した手順と理由は[比較調査](docs/skill-survey.md)で確認できます。
 
 | Skill | 担当と確認すること | 土台・参考資料 |

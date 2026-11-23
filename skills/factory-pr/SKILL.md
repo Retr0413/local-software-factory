@@ -1,52 +1,21 @@
 ---
 name: factory-pr
-description: Publish or follow up on a Factory-managed GitHub PR when requested. Run the existing Walden review and return fixes to the original Herdr implementation session.
+description: Factory の PR 作成・更新を依頼されたとき、または既存 PR の CI 失敗・未解決スレッドを調査して元の担当へ返すときに使う。
 ---
 
 # Factory の PR 作成とフォローアップ
 
 統括が、ユーザーの依頼に含まれる PR 作成、レビュー指摘や CI 失敗への対応に使う。対象リポジトリと Issue または PR、ベース、候補 SHA、元の Herdr 実装担当、許可された GitHub 操作を確認する。
 
-## PR を作成する
+## Description から読む Skill を選ぶ
 
-1. 実装担当の worktree で候補 SHA、ベース、差分、未コミットの変更、同じブランチの既存 PR を確認する。QA、該当するセキュリティ確認、未検証事項を候補 SHA に結びつける。
-2. 統括が候補の worktree または PR を対象に、利用中の CLI に登録された `my-walden-review` を実行する。Codex ではその Skill の Codex 向け手順にも従う。Walden レビューを実行できない場合は、理由と確認できた範囲を伝え、対象リポジトリの PR ルールに従う。
-3. `REQUEST_CHANGES` や、QA・セキュリティ確認で修正が必要になった項目は、[統括の指摘対応](../factory-orchestrate/SKILL.md#指摘対応)で扱う。`NEEDS_DISCUSSION` は判断が必要な点をユーザーに伝える。判定と残る未確認事項を踏まえて、依頼された PR 作成を進める。
-4. リポジトリの PR テンプレートに沿って目的、変更、関連 Issue、検証結果、証跡、未確認事項を書く。依頼された範囲で候補を push し、同じブランチの PR があれば再利用する。PR URL と公開したコミット SHA を返す。マージはユーザーから依頼されたときに扱う。
+今の判断に合う行のリンクを開く。次の条件が生じたら、この表から選び直す。
 
-## 既存の PR に対応する
-
-1. PR の作成者、現在の head SHA、レビューのスレッドと CI の結果を確認する。他人の PR の扱いは `my-walden-review` の作成者判定に従う。CI の失敗原因はログで確認し、コード変更が必要なものと環境側の失敗を区別する。
-2. 関連 Issue と [Factory の作業記録](../factory-record/SKILL.md) を使って元の Herdr 実装担当を特定する。担当が停止している場合は、同じ仕事の作業環境と会話を照合してから再開する。対応を依頼された指摘は、[統括の指摘対応](../factory-orchestrate/SKILL.md#指摘対応)で扱う。
-3. push の前に、現在の PR の head が確認済みの head と一致し、公開するコミットが検証済みの候補 SHA と一致することを確かめる。新しい変更があれば対象と確認結果を見直す。必要な Walden レビューを経て依頼された範囲で PR を更新し、更新後の CI を確認する。再確認の結果と残る対応を作業記録に渡す。
-
-## 公開時の照合と CI の切り分け
-
-GitHub CLI を使う場合は、対象リポジトリで `gh pr view <番号> --json url,author,baseRefName,headRefOid,headRefName` を読み、対象と作業記録を照合する。PR 本文には「何が変わるか」「その挙動をどの条件で確認したか」「残る未確認事項」を具体的に書く。証跡がローカルの絶対パスだけなら、PR 読者が読める結果の要約を本文に入れる。
-
-既存 PR は `gh pr checks <番号>` で失敗したチェックと詳細 URL を特定する。GitHub Actions はその実行のジョブ・最初に失敗したステップ・原因を示す短いログを確認する。実行が PR のどの候補に対応するかも照合する。
-
-| 観測 | 対応 |
+| Description（使う場面） | 読む Skill・資料 |
 | --- | --- |
-| 対象候補のテストに期待値と実測値の差がある | テスト名、入力、関連ログ、実行 URL を指摘対応に渡す |
-| セットアップで停止し、テストは開始していない | 失敗した前提と再開条件を報告する。製品の受入条件は未確認とする |
-| 外部 CI で詳細を読めない | プロバイダと詳細 URL、GitHub から見える状態を返す |
-| 過去の候補に対する失敗や成功が表示されている | 現在の候補に対応する結果を探す。結果待ちはそのまま報告する |
+| 検証済みの候補を初めて PR として公開するとき、Walden 判定・対象差分・既存 PR を照合する。 | [Walden レビューと PR 作成](procedures/factory-pr-publish/SKILL.md) |
+| 既存 PR に修正を反映する依頼を受け、元の実装担当・現在の head・再確認範囲を特定する。 | [元の担当への引き継ぎと更新](procedures/factory-pr-follow-up/SKILL.md) |
+| PR のチェック失敗・結果待ち・再試行・古い実行が混在するとき、現在の head について判定する。 | [CI の切り分け](procedures/factory-pr-ci/SKILL.md) |
+| 既存 PR の古い差分・重複・部分取得を含むレビュー指摘から、現行 head での残件を特定する。 | [レビュースレッドの確認](procedures/factory-pr-review-threads/SKILL.md) |
 
-CI の再実行や外部投稿は依頼された範囲で行う。再実行結果を使う場合は、最初の失敗と両方の実行をたどれるようにする。
-
-GitHub Actions の詳細 URL から実行 ID を取得できれば、`gh run view <実行ID> --log-failed` で失敗箇所を読む。PR とベースの仮マージをテストする workflow では、実行 SHA が PR の head と異なることがある。イベント・対象 PR・テストされた head/base を照合してから、古い結果かどうかを判断する。
-
-## レビューコメントから修正対象を特定する
-
-GitHub のレビューを扱うときは、取得できる連携機能で未解決スレッドを列挙する。GitHub CLI からは、この Skill の [読み取り専用スクリプト](scripts/list_review_threads.py) を使える。
-
-```sh
-python3 "$FACTORY_PR_SKILL/scripts/list_review_threads.py" OWNER REPO PR番号
-```
-
-`FACTORY_PR_SKILL` は読み込んだ Skill のディレクトリ。出力はインラインの未解決スレッドで、最初の指摘と最新の返答を含む。経緯が判断に影響する場合はコメント URL で中間の会話も読む。PR 全体へのレビュー本文・通常コメントは別途確認する。途中ページの取得失敗は未解決ゼロと区別する。
-
-古い差分に付いた未解決の指摘は、最新 head の対応箇所と当初の期待を照合する。現行コードで対処済みなら、その箇所と確認結果を報告する。同じ修正で複数スレッドを扱える場合は、期待値ごとに一つの作業にまとめ、元の URL はすべて渡す。返信・スレッド解決などの外部操作は依頼範囲に従う。
-
-ページの一部しか取得できていない場合、観測済みのスレッド数は下限として伝える。取得済みの同一指摘はまとめて元担当に渡せる。残件総数と解決判断は取得完了まで保留する。公開判断には、その時点の head に対応する QA と CI の状態を別々に記す。
+調査結果には対象 PR と head を添える。公開・返信・マージは依頼された操作の範囲に従う。

@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -59,6 +60,27 @@ class PromptRouting(unittest.TestCase):
             self.assertIsNone(hook.route({**event, "permission_mode": "plan"}))
             Path(repo, ".git", "local-software-factory-worker").touch()
             self.assertIsNone(hook.route(event))
+
+
+class SkillRouting(unittest.TestCase):
+    def test_each_internal_skill_is_reachable_by_its_description(self):
+        for entry in (ROOT / "skills").glob("*/SKILL.md"):
+            with self.subTest(role=entry.parent.name):
+                routes = {}
+                for row in entry.read_text().splitlines():
+                    target = re.search(r"\]\((procedures/[^)]+/SKILL\.md)\)", row)
+                    if target and row.startswith("|"):
+                        routes[target[1]] = row.split("|")[1].strip()
+
+                folder = entry.parent
+                procedures = sorted(folder.glob("procedures/*/SKILL.md"))
+                self.assertTrue(procedures)
+                self.assertEqual(set(routes), {p.relative_to(folder).as_posix() for p in procedures})
+                for procedure in procedures:
+                    with self.subTest(procedure=procedure.parent.name):
+                        metadata = procedure.read_text().split("---", 2)[1].splitlines()
+                        path = procedure.relative_to(folder).as_posix()
+                        self.assertIn("description: " + routes[path], metadata)
 
 
 class Install(unittest.TestCase):

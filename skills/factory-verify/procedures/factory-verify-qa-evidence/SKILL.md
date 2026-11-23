@@ -1,3 +1,8 @@
+---
+name: factory-verify-qa-evidence
+description: UI・CLI・API の操作を再現し、利用者から見える結果と証跡を記録する。
+---
+
 # QA と動作証跡
 
 - 受入条件ごとに、準備、操作、期待する結果を決める。関連する既存テストに加え、変更が利用者に届く入口で確認する。UI は操作後の表示、CLI は出力と終了コード、API は応答と必要なデータへの反映を確認する。
@@ -20,3 +25,11 @@
 再試行でだけ通った場合は、最初の失敗と再試行の条件を残す。別の worktree でも試す場合は、同じデータベースやサーバーを共有していないかを確認し、どの候補を実際に操作したか明示する。
 
 動的な画面では、表示されたボタンや入力欄を操作前に特定し、遷移やモーダルの開閉後に取り直す。古い要素を参照した失敗と、利用者が操作しても機能しない失敗を区別する。証跡を渡す前に実際に開き、指定の画面・値が写っているか、動画なら該当時刻を確認する。
+
+## 判断例
+
+保存後の表示が正しくても再ログインで値が戻る報告なら、同じテスト利用者で新しいセッションを開き、読み戻し結果を記録する。セッション再作成ができなければ、保存直後の表示までを確認済みとする。
+
+## 出典と採用した観点
+
+描画後の観測と操作、取得した証跡を開いて主張と照合する手順を採用した。[anthropics / webapp-testing](https://github.com/anthropics/skills/blob/e4bb5d960d87126ff3b3a8af1a104b7db67560ba/skills/webapp-testing/SKILL.md)・[Factory-AI / droid-control](https://github.com/Factory-AI/factory-plugins/blob/e63e519a736140c86f37be95a529a0c44dc9a96e/plugins/droid-control/skills/droid-control/SKILL.md)
